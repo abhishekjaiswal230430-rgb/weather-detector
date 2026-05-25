@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Detector using Machine Learning (Demo Mode)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <!-- Background elements for colorful gradients -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i data-lucide="cloud-lightning" class="logo-svg"></i>
+                </div>
+                <div>
+                    <h1>AeroPredict</h1>
+                    <span class="logo-subtitle">Weather AI Engine</span>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-btn active" id="btn-predict" onclick="switchTab('predict')">
+                    <i data-lucide="sliders"></i>
+                    <span>Predict Weather</span>
+                </button>
+                <button class="nav-btn" id="btn-history" onclick="switchTab('history')">
+                    <i data-lucide="history"></i>
+                    <span>Prediction History</span>
+                </button>
+                <button class="nav-btn" id="btn-model" onclick="switchTab('model')">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>Model Analytics</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="model-badge">
+                    <i data-lucide="cpu" class="badge-icon"></i>
+                    <div>
+                        <div class="badge-title">Random Forest CLF</div>
+                        <div class="badge-status" style="color: #fbbf24;">Status: Client Demo</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div>
+                    <h2 id="tab-title">Weather Detector Dashboard (Demo)</h2>
+                    <p class="tab-desc" id="tab-desc">Input meteorological parameters to predict local weather conditions using machine learning.</p>
+                </div>
+                <div class="current-time-widget">
+                    <i data-lucide="calendar" class="time-icon"></i>
+                    <span id="date-time-display">Loading...</span>
+                </div>
+            </header>
+
+            <!-- TAB 1: PREDICT WEATHER -->
+            <section class="tab-content active" id="tab-content-predict">
+                <div class="predict-grid">
+                    <!-- Form Card -->
+                    <div class="glass-card form-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Meteorological Inputs</h3>
+                            <p class="card-subtitle">Adjust parameters using sliders or type values directly.</p>
+                        </div>
+                        
+                        <form id="weather-form" onsubmit="handlePrediction(event)">
+                            <!-- Parameter 1: Temperature -->
+                            <div class="input-group">
+                                <div class="input-labels">
+                                    <label for="temperature-input">
+                                        <i data-lucide="thermometer" class="input-icon icon-temp"></i>
+                                        Temperature (°C)
+                                    </label>
+                                    <input type="number" id="temperature-num" min="-10" max="45" step="0.1" value="20" class="numeric-val" oninput="syncInputs('temperature', 'num')">
+                                </div>
+                                <div class="slider-wrapper">
+                                    <span class="range-limit">-10</span>
+                                    <input type="range" id="temperature-slider" min="-10" max="45" step="0.1" value="20" class="slider" oninput="syncInputs('temperature', 'slider')">
+                                    <span class="range-limit">45</span>
+                                </div>
+                            </div>
+
+                            <!-- Parameter 2: Humidity -->
+                            <div class="input-group">
+                                <div class="input-labels">
+                                    <label for="humidity-input">
+                                        <i data-lucide="droplets" class="input-icon icon-humidity"></i>
+                                        Humidity (%)
+                                    </label>
+                                    <input type="number" id="humidity-num" min="10" max="100" step="1" value="50" class="numeric-val" oninput="syncInputs('humidity', 'num')">
+                                </div>
+                                <div class="slider-wrapper">
+                                    <span class="range-limit">10</span>
+                                    <input type="range" id="humidity-slider" min="10" max="100" step="1" value="50" class="slider" oninput="syncInputs('humidity', 'slider')">
+                                    <span class="range-limit">100</span>
+                                </div>
+                            </div>
+
+                            <!-- Parameter 3: Wind Speed -->
+                            <div class="input-group">
+                                <div class="input-labels">
+                                    <label for="wind-input">
+                                        <i data-lucide="wind" class="input-icon icon-wind"></i>
+                                        Wind Speed (km/h)
+                                    </label>
+                                    <input type="number" id="wind-num" min="0" max="60" step="0.1" value="15" class="numeric-val" oninput="syncInputs('wind', 'num')">
+                                </div>
+                                <div class="slider-wrapper">
+                                    <span class="range-limit">0</span>
+                                    <input type="range" id="wind-slider" min="0" max="60" step="0.1" value="15" class="slider" oninput="syncInputs('wind', 'slider')">
+                                    <span class="range-limit">60</span>
+                                </div>
+                            </div>
+
+                            <!-- Parameter 4: Atmospheric Pressure -->
+                            <div class="input-group">
+                                <div class="input-labels">
+                                    <label for="pressure-input">
+                                        <i data-lucide="gauge" class="input-icon icon-pressure"></i>
+                                        Atmospheric Pressure (hPa)
+                                    </label>
+                                    <input type="number" id="pressure-num" min="970" max="1030" step="1" value="1010" class="numeric-val" oninput="syncInputs('pressure', 'num')">
+                                </div>
+                                <div class="slider-wrapper">
+                                    <span class="range-limit">970</span>
+                                    <input type="range" id="pressure-slider" min="970" max="1030" step="1" value="1010" class="slider" oninput="syncInputs('pressure', 'slider')">
+                                    <span class="range-limit">1030</span>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn" id="predict-submit-btn">
+                                <i data-lucide="activity"></i>
+                                <span>Analyze & Predict</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Result Card -->
+                    <div class="glass-card result-panel" id="result-panel">
+                        <div class="result-placeholder" id="result-placeholder">
+                            <div class="placeholder-icon">
+                                <i data-lucide="cloud-sun" class="floating-icon"></i>
+                            </div>
+                            <h3>Awaiting Analysis</h3>
+                            <p>Adjust the meteorological inputs and click "Analyze & Predict" to see the machine learning classification results.</p>
+                        </div>
+                        
+                        <div class="result-details hidden" id="result-data">
+                            <div class="result-main-info">
+                                <div class="result-header-row">
+                                    <span class="result-badge">Prediction Output</span>
+                                    <span class="confidence-badge" id="confidence-val">94.5% Match</span>
+                                </div>
+                                <div class="weather-title-container">
+                                    <div class="weather-icon-wrapper" id="weather-icon-div">
+                                        <i data-lucide="sun" id="weather-icon-large"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="weather-state-name" id="predicted-state">Sunny</h2>
+                                        <p class="weather-desc" id="weather-explanation">High pressure is maintaining clear skies.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recommendations -->
+                            <div class="recommendation-box">
+                                <div class="rec-title">
+                                    <i data-lucide="info" class="rec-icon"></i>
+                                    <span>AI Assistant Advisory</span>
+                                </div>
+                                <p class="rec-text" id="weather-recommendation">Wear sunscreen, grab sunglasses, and stay hydrated.</p>
+                            </div>
+
+                            <!-- Probabilities Bars -->
+                            <div class="probabilities-container">
+                                <h4 class="prob-title">Classifier Probabilities</h4>
+                                <div class="prob-list" id="prob-bars-list">
+                                    <!-- Dynamic rows created by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: PREDICTION HISTORY -->
+            <section class="tab-content" id="tab-content-history">
+                <div class="glass-card table-card">
+                    <div class="table-header">
+                        <div class="table-header-info">
+                            <h3 class="card-title">Logged Prediction History</h3>
+                            <p class="card-subtitle">Previous meteorological queries logged in this local session.</p>
+                        </div>
+                        <button class="clear-history-btn" id="btn-clear-history" onclick="clearHistory()">
+                            <i data-lucide="trash-2"></i>
+                            <span>Clear Session History</span>
+                        </button>
+                    </div>
+
+                    <div class="table-scroll-container">
+                        <table class="history-table" id="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Temperature (°C)</th>
+                                    <th>Humidity (%)</th>
+                                    <th>Wind Speed (km/h)</th>
+                                    <th>Pressure (hPa)</th>
+                                    <th>Predicted Weather</th>
+                                    <th>Confidence</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-tbody">
+                                <!-- Dynamic entries populated by JS -->
+                            </tbody>
+                        </table>
+                        
+                        <div class="empty-history-placeholder hidden" id="empty-history-state">
+                            <i data-lucide="inbox"></i>
+                            <p>No predictions logged yet. Make some weather predictions to view history records.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: MODEL ANALYTICS -->
+            <section class="tab-content" id="tab-content-model">
+                <div class="stats-overview-grid">
+                    <!-- Model Card -->
+                    <div class="glass-card stats-card">
+                        <i data-lucide="settings" class="stats-card-icon"></i>
+                        <div class="stats-card-val" id="model-algorithm">Random Forest</div>
+                        <div class="stats-card-lbl">Algorithm Model</div>
+                    </div>
+                    <div class="glass-card stats-card">
+                        <i data-lucide="tree-pine" class="stats-card-icon"></i>
+                        <div class="stats-card-val" id="model-trees">150</div>
+                        <div class="stats-card-lbl">Decision Trees (n_estimators)</div>
+                    </div>
+                    <div class="glass-card stats-card">
+                        <i data-lucide="chevrons-up-down" class="stats-card-icon"></i>
+                        <div class="stats-card-val" id="model-depth">12</div>
+                        <div class="stats-card-lbl">Max Depth Limit</div>
+                    </div>
+                    <div class="glass-card stats-card highlight-metric">
+                        <i data-lucide="award" class="stats-card-icon"></i>
+                        <div class="stats-card-val" id="model-accuracy">94.8%</div>
+                        <div class="stats-card-lbl">Test Model Accuracy</div>
+                    </div>
+                </div>
+
+                <div class="analytics-grid">
+                    <!-- Feature Importances -->
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Feature Importance Analysis</h3>
+                            <p class="card-subtitle">Calculated Random Forest Gini index weights for each factor.</p>
+                        </div>
+                        <div class="importance-list-wrapper" id="importance-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Evaluation Plots Carousel -->
+                    <div class="glass-card plots-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Model Evaluation Metrics</h3>
+                            <p class="card-subtitle">Visualizations generated during pipeline validation.</p>
+                        </div>
+                        <div class="carousel-container">
+                            <div class="carousel-slides">
+                                <div class="carousel-slide active" id="slide-1">
+                                    <img src="static/plots/confusion_matrix.png" alt="Confusion Matrix" class="plot-img">
+                                    <p class="plot-caption">Confusion Matrix: Shows actual vs predicted occurrences across classes.</p>
+                                </div>
+                                <div class="carousel-slide" id="slide-2">
+                                    <img src="static/plots/feature_importance.png" alt="Feature Importances" class="plot-img">
+                                    <p class="plot-caption">Feature Importances: Ranks the impact of parameters on model decisions.</p>
+                                </div>
+                                <div class="carousel-slide" id="slide-3">
+                                    <img src="static/plots/weather_distribution.png" alt="Weather Class Distribution" class="plot-img">
+                                    <p class="plot-caption">Target Class Distribution: Volume of Sunny, Cloudy, Rainy, Foggy, Stormy samples.</p>
+                                </div>
+                            </div>
+                            <div class="carousel-controls">
+                                <button class="carousel-btn" onclick="prevSlide()"><i data-lucide="chevron-left"></i></button>
+                                <div class="carousel-dots" id="carousel-dots">
+                                    <span class="dot active" onclick="setSlide(0)"></span>
+                                    <span class="dot" onclick="setSlide(1)"></span>
+                                    <span class="dot" onclick="setSlide(2)"></span>
+                                </div>
+                                <button class="carousel-btn" onclick="nextSlide()"><i data-lucide="chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Demo JavaScript logic -->
+    <script src="static/js/demo.js"></script>
+</body>
+</html>
